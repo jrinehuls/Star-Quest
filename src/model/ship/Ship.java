@@ -1,18 +1,20 @@
 package model.ship;
 
+import model.missile.UnguidedMissile;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public abstract class Ship {
 
-    protected double x;
-    protected double y;
     protected int speed;
     protected int orientation;
     protected int rotationSpeed;
 
     protected BufferedImage image;
+    protected int unguidedMissileCount;
 
     public Ship(String pathToImage, int speed, int rotationSpeed) {
         this.speed = speed;
@@ -24,23 +26,6 @@ public abstract class Ship {
             System.out.println("Picture not found");
             image = null;
         }
-    }
-
-
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
     }
 
     public int getSpeed() {
@@ -75,5 +60,8 @@ public abstract class Ship {
         this.image = image;
     }
 
+    public int getUnguidedMissileCount() {
+        return unguidedMissileCount;
+    }
 
 }

@@ -7,6 +7,7 @@ import view.panel.GamePanel;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
 
 public class Player {
 
@@ -16,32 +17,43 @@ public class Player {
     double m11 = 1; // height maybe
 
     KeyHandler keyHandler;
-    UnguidedMissile unguidedMissile = null;
+    ArrayList<UnguidedMissile> firedUnguidedMissiles = new ArrayList<>();
     Ship playerShip;
     double x;
     double y;
+    boolean allowFireable;
+    int unguidedMissileCount;
 
     public Player(Ship playerShip, KeyHandler keyHandler) {
         this.keyHandler = keyHandler;
         this.playerShip = playerShip;
+        this.unguidedMissileCount = playerShip.getUnguidedMissileCount();
 
         x = (GamePanel.SCREEN_WIDTH - playerShip.getImage().getWidth() * m00) / 2.0;
         y = (GamePanel.SCREEN_HEIGHT - playerShip.getImage().getHeight() * m11) / 2.0;
         playerShip.setOrientation(0);
     }
 
-    public void createMissile() {
-        if (keyHandler.missileFired) {
-            unguidedMissile = new UnguidedMissile(x, y, playerShip.getOrientation());
+    public void makeFireable() {
+        if (keyHandler.unguidedMissileFired && unguidedMissileCount > 0) {
+            allowFireable = true;
         }
     }
+
     public void fireMissile() {
-        if (!keyHandler.missileFired && unguidedMissile != null) {
-            if (!unguidedMissile.isVisible()) {
-                unguidedMissile.setVisible(true);
-            }
-            unguidedMissile.setX(unguidedMissile.getX() + unguidedMissile.getSpeed() * Math.sin(Math.toRadians(unguidedMissile.getOrientation())));
-            unguidedMissile.setY(unguidedMissile.getY() - unguidedMissile.getSpeed() * Math.cos(Math.toRadians(unguidedMissile.getOrientation())));
+        if (!keyHandler.unguidedMissileFired && allowFireable) {
+            UnguidedMissile unguidedMissile = new UnguidedMissile(x, y, playerShip.getOrientation());
+            unguidedMissile.setVisible(true);
+            firedUnguidedMissiles.add(unguidedMissile);
+            unguidedMissileCount--;
+            allowFireable = false;
+        }
+    }
+
+    public void moveMissiles() {
+        for (UnguidedMissile ugm: firedUnguidedMissiles) {
+            ugm.setX(ugm.getX() + ugm.getSpeed() * Math.sin(Math.toRadians(ugm.getOrientation())));
+            ugm.setY(ugm.getY() - ugm.getSpeed() * Math.cos(Math.toRadians(ugm.getOrientation())));
         }
     }
 
@@ -56,8 +68,9 @@ public class Player {
         if (keyHandler.rotateLeft) {
             playerShip.setOrientation(playerShip.getOrientation() - playerShip.getRotationSpeed());
         }
-        createMissile();
+        makeFireable();
         fireMissile();
+        moveMissiles();
 
     }
 
@@ -67,11 +80,16 @@ public class Player {
         playerTransformer.rotate(Math.toRadians(playerShip.getOrientation()),  playerShip.getImage().getWidth()/2.0,
                 playerShip.getImage().getHeight()/2.0);
         g2d.drawImage(playerShip.getImage(), playerTransformer, null);
-
-        if (unguidedMissile != null && unguidedMissile.getImage() != null) {
-            AffineTransform unguidedMissileTransformer = new AffineTransform(m00, m10, m01, m11, unguidedMissile.getX(), unguidedMissile.getY());
-            unguidedMissileTransformer.rotate(Math.toRadians(unguidedMissile.getOrientation()), unguidedMissile.getImage().getWidth() / 2.0, unguidedMissile.getImage().getHeight() / 2.0);
-            g2d.drawImage(unguidedMissile.getImage(), unguidedMissileTransformer, null);
+// -----------------------------Draw the unguided missiles------------------------------
+        for (UnguidedMissile ugm: firedUnguidedMissiles) {
+            if (ugm != null && ugm.getImage() != null) {
+                AffineTransform unguidedMissileTransformer = new AffineTransform(m00, m10, m01, m11, ugm.getX(), ugm.getY());
+                unguidedMissileTransformer.rotate(Math.toRadians(ugm.getOrientation()), ugm.getImage().getWidth() / 2.0,
+                        ugm.getImage().getHeight() / 2.0);
+                g2d.drawImage(ugm.getImage(), unguidedMissileTransformer, null);
+            }
         }
+
     }
+
 }
