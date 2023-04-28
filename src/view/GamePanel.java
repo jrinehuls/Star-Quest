@@ -8,9 +8,9 @@ import java.awt.*;
 
 public class GamePanel extends JPanel implements Runnable {
 
-    public static final int TILE_SIZE = 48;
-    private static final int NUM_COLS = 24;
-    private static final int NUM_ROWS = 16;
+    public static final int TILE_SIZE = 32;
+    private static final int NUM_COLS = 36;
+    private static final int NUM_ROWS = 24;
     public static final int SCREEN_WIDTH = TILE_SIZE * NUM_COLS;
     public static final int SCREEN_HEIGHT = TILE_SIZE * NUM_ROWS;
 

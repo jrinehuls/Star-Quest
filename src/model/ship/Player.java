@@ -7,6 +7,7 @@ import view.GamePanel;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class Player extends Ship {
@@ -22,7 +23,7 @@ public class Player extends Ship {
     public Player(KeyHandler keyHandler) {
         this.keyHandler = keyHandler;
 
-        getImages();
+        this.image = getImage();
 
         orientation = 0;
         rotationSpeed = 1;
@@ -32,11 +33,12 @@ public class Player extends Ship {
 
     }
 
-    public void getImages() {
+    public BufferedImage getImage() {
         try {
-            image = ImageIO.read(getClass().getResourceAsStream("/res/player/Fighter.png"));
+            return ImageIO.read(getClass().getResourceAsStream("/res/ship/Fighter.png"));
         } catch (IOException e) {
             System.out.println("Picture not found");
+            return null;
         }
     }
 
@@ -55,6 +57,8 @@ public class Player extends Ship {
         }
         if (keyHandler.rotateLeft) {
             orientation -= rotationSpeed;
+        }
+        if (keyHandler.missileFired) {
             fireMissile();
         }
         if (unguidedMissile != null && unguidedMissile.isFired()) {
