@@ -35,7 +35,10 @@ public class Player extends Ship {
 
     public BufferedImage getImage() {
         try {
+
             return ImageIO.read(getClass().getResourceAsStream("/res/ship/Fighter.png"));
+
+
         } catch (IOException e) {
             System.out.println("Picture not found");
             return null;
