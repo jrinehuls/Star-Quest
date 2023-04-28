@@ -5,7 +5,7 @@ import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener {
 
-    public boolean forwardPressed, rotateRight, rotateLeft, missileFired;
+    public boolean forwardPressed, backwardPressed, rotateRight, rotateLeft, missileFired;
 
     public KeyHandler() {
 
@@ -16,6 +16,9 @@ public class KeyHandler implements KeyListener {
         int code = e.getKeyCode();
         if (code == KeyEvent.VK_W) {
             forwardPressed = true;
+        }
+        if (code == KeyEvent.VK_S) {
+            backwardPressed = true;
         }
         if (code == KeyEvent.VK_A) {
             rotateLeft = true;
@@ -33,6 +36,9 @@ public class KeyHandler implements KeyListener {
         int code = e.getKeyCode();
         if (code == KeyEvent.VK_W) {
             forwardPressed = false;
+        }
+        if (code == KeyEvent.VK_S) {
+            backwardPressed = true;
         }
         if (code == KeyEvent.VK_A) {
             rotateLeft = false;

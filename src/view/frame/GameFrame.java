@@ -1,4 +1,6 @@
-package view;
+package view.frame;
+
+import view.panel.GamePanel;
 
 import javax.swing.*;
 

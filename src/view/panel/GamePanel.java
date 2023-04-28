@@ -1,7 +1,8 @@
-package view;
+package view.panel;
 
-import model.ship.Player;
+import character.Player;
 import controller.KeyHandler;
+import model.ship.Fighter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +18,7 @@ public class GamePanel extends JPanel implements Runnable {
     private Thread gameThread = new Thread(this);
 
     KeyHandler keyHandler = new KeyHandler();
-    Player player = new Player(keyHandler);
+    Player player = new Player(new Fighter(), keyHandler);
 
     public GamePanel() {
         this.setFocusable(true);

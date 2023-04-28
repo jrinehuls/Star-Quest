@@ -1,6 +1,8 @@
 package model.missile;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public abstract class Missile {
 
@@ -9,20 +11,21 @@ public abstract class Missile {
     protected int speed;
     protected int orientation;
     protected int rotationSpeed;
+    protected String pathToImage;
+    protected boolean isVisible;
 
+    protected BufferedImage image;
 
-    protected boolean isFired;
-
-    protected BufferedImage image = null;
-
-
-    public Missile(double x, double y, int speed, int orientation, int rotationSpeed, BufferedImage image) {
+    public Missile(double x, double y, int speed, int orientation, int rotationSpeed, String pathToImage) {
         this.x = x;
         this.y = y;
         this.speed = speed;
         this.orientation = orientation;
         this.rotationSpeed = rotationSpeed;
-        this.image = image;
+        this.pathToImage = pathToImage;
+
+        image = null;
+
     }
 
     public double getX() {
@@ -61,16 +64,23 @@ public abstract class Missile {
         return image;
     }
 
-    public void setImage(BufferedImage image) {
-        this.image = image;
+    public void setVisible(Boolean visible) {
+        this.isVisible = visible;
+        if (this.isVisible) {
+            try {
+                image = ImageIO.read(getClass().getResourceAsStream(this.pathToImage));
+            } catch (IOException e) {
+                System.out.println("Picture not found");
+                image = null;
+            }
+        }
+        else {
+            image = null;
+        }
     }
 
-    public void setFired(boolean fired) {
-        isFired = fired;
-    }
-
-    public boolean isFired() {
-        return isFired;
+    public boolean isVisible() {
+        return this.isVisible;
     }
 
 }
