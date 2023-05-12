@@ -11,26 +11,39 @@ import java.util.ArrayList;
 
 public class Player {
 
-    double m00 = 1; // width maybe
-    double m10 = 0;
-    double m01 = 0;
-    double m11 = 1; // height maybe
+    int m00 = 1; // width maybe
+    int m10 = 0;
+    int m01 = 0;
+    int m11 = 1; // height maybe
 
     KeyHandler keyHandler;
     ArrayList<UnguidedMissile> firedUnguidedMissiles = new ArrayList<>();
     Ship playerShip;
-    double x;
-    double y;
-    boolean allowFireable;
-    int unguidedMissileCount;
+
+    private boolean allowFireable;
+    private int unguidedMissileCount;
+
+    // TODO: Use worldX and worldY for player movement. Call playerX screenX and make final.
+    private static double playerX;
+    private static double playerY;
+    private static int worldX;
+    private static int worldY;
+    public static int WIDTH;
+    public static int HEIGHT;
 
     public Player(Ship playerShip, KeyHandler keyHandler) {
         this.keyHandler = keyHandler;
         this.playerShip = playerShip;
         this.unguidedMissileCount = playerShip.getUnguidedMissileCount();
 
-        x = (GamePanel.SCREEN_WIDTH - playerShip.getImage().getWidth() * m00) / 2.0;
-        y = (GamePanel.SCREEN_HEIGHT - playerShip.getImage().getHeight() * m11) / 2.0;
+        WIDTH = playerShip.getImage().getWidth() * m00;
+        HEIGHT = playerShip.getImage().getHeight() * m11;
+
+        playerX = (GamePanel.SCREEN_WIDTH - WIDTH) / 2.0;
+        playerY = (GamePanel.SCREEN_HEIGHT - HEIGHT) / 2.0;
+        worldX = (GamePanel.WORLD_WIDTH - WIDTH) / 2;
+        worldY = (GamePanel.WORLD_HEIGHT - HEIGHT) / 2;
+
         playerShip.setOrientation(0);
     }
 
@@ -42,7 +55,7 @@ public class Player {
 
     public void fireMissile() {
         if (!keyHandler.unguidedMissileFired && allowFireable) {
-            UnguidedMissile unguidedMissile = new UnguidedMissile(x, y, playerShip.getOrientation());
+            UnguidedMissile unguidedMissile = new UnguidedMissile(playerX, playerY, playerShip.getOrientation());
             unguidedMissile.setVisible(true);
             firedUnguidedMissiles.add(unguidedMissile);
             unguidedMissileCount--;
@@ -59,8 +72,9 @@ public class Player {
 
     public void update() {
         if (keyHandler.forwardPressed) {
-            y -= playerShip.getSpeed() * Math.cos(Math.toRadians(playerShip.getOrientation()));
-            x += playerShip.getSpeed() * Math.sin(Math.toRadians(playerShip.getOrientation()));
+            worldY -= playerShip.getSpeed() * Math.cos(Math.toRadians(playerShip.getOrientation()));
+            worldX += playerShip.getSpeed() * Math.sin(Math.toRadians(playerShip.getOrientation()));
+
         }
         if (keyHandler.rotateRight) {
             playerShip.setOrientation(playerShip.getOrientation() + playerShip.getRotationSpeed());
@@ -76,20 +90,34 @@ public class Player {
 
     public void draw(Graphics2D g2d) {
 
-        AffineTransform playerTransformer = new AffineTransform(m00, m10, m01, m11, x, y);
+        AffineTransform playerTransformer = new AffineTransform(m00, m10, m01, m11, playerX, playerY);
         playerTransformer.rotate(Math.toRadians(playerShip.getOrientation()),  playerShip.getImage().getWidth()/2.0,
                 playerShip.getImage().getHeight()/2.0);
         g2d.drawImage(playerShip.getImage(), playerTransformer, null);
 // -----------------------------Draw the unguided missiles------------------------------
         for (UnguidedMissile ugm: firedUnguidedMissiles) {
-            if (ugm != null && ugm.getImage() != null) {
+            //if (ugm != null && ugm.getImage() != null) {
                 AffineTransform unguidedMissileTransformer = new AffineTransform(m00, m10, m01, m11, ugm.getX(), ugm.getY());
                 unguidedMissileTransformer.rotate(Math.toRadians(ugm.getOrientation()), ugm.getImage().getWidth() / 2.0,
                         ugm.getImage().getHeight() / 2.0);
                 g2d.drawImage(ugm.getImage(), unguidedMissileTransformer, null);
-            }
+            //}
         }
-
     }
 
+    public static int getWorldX() {
+        return worldX;
+    }
+
+    public static int getWorldY() {
+        return worldY;
+    }
+
+    public static double getScreenX() {
+        return playerX;
+    }
+
+    public static double getScreenY() {
+        return playerY;
+    }
 }
