@@ -16,20 +16,22 @@ public class Player {
     int m01 = 0;
     int m11 = 1; // height maybe
 
+    Ship playerShip;
     KeyHandler keyHandler;
     ArrayList<UnguidedMissile> firedUnguidedMissiles = new ArrayList<>();
-    Ship playerShip;
 
     private boolean allowFireable;
     private int unguidedMissileCount;
 
-    // TODO: Use worldX and worldY for player movement. Call playerX screenX and make final.
-    private static double playerX;
-    private static double playerY;
+    // Changed screen x & y to int from double.
+    private static int screenX;
+    private static int screenY;
     private static int worldX;
     private static int worldY;
     public static int WIDTH;
     public static int HEIGHT;
+
+    AffineTransform playerTransformer;
 
     public Player(Ship playerShip, KeyHandler keyHandler) {
         this.keyHandler = keyHandler;
@@ -39,11 +41,12 @@ public class Player {
         WIDTH = playerShip.getImage().getWidth() * m00;
         HEIGHT = playerShip.getImage().getHeight() * m11;
 
-        playerX = (GamePanel.SCREEN_WIDTH - WIDTH) / 2.0;
-        playerY = (GamePanel.SCREEN_HEIGHT - HEIGHT) / 2.0;
+        screenX = (GamePanel.SCREEN_WIDTH - WIDTH) / 2;
+        screenY = (GamePanel.SCREEN_HEIGHT - HEIGHT) / 2;
         worldX = (GamePanel.WORLD_WIDTH - WIDTH) / 2;
         worldY = (GamePanel.WORLD_HEIGHT - HEIGHT) / 2;
 
+        playerTransformer = new AffineTransform(m00, m10, m01, m11, screenX, screenY);
         playerShip.setOrientation(0);
     }
 
@@ -55,7 +58,7 @@ public class Player {
 
     public void fireMissile() {
         if (!keyHandler.unguidedMissileFired && allowFireable) {
-            UnguidedMissile unguidedMissile = new UnguidedMissile(playerX, playerY, playerShip.getOrientation());
+            UnguidedMissile unguidedMissile = new UnguidedMissile(screenX, screenY, playerShip.getOrientation());
             unguidedMissile.setVisible(true);
             firedUnguidedMissiles.add(unguidedMissile);
             unguidedMissileCount--;
@@ -70,11 +73,10 @@ public class Player {
         }
     }
 
-    public void update() {
+    public void movePlayer() {
         if (keyHandler.forwardPressed) {
-            worldY -= playerShip.getSpeed() * Math.cos(Math.toRadians(playerShip.getOrientation()));
-            worldX += playerShip.getSpeed() * Math.sin(Math.toRadians(playerShip.getOrientation()));
-
+            worldY -= Math.round(playerShip.getSpeed() * Math.cos(Math.toRadians(playerShip.getOrientation())));
+            worldX += Math.round(playerShip.getSpeed() * Math.sin(Math.toRadians(playerShip.getOrientation())));
         }
         if (keyHandler.rotateRight) {
             playerShip.setOrientation(playerShip.getOrientation() + playerShip.getRotationSpeed());
@@ -82,15 +84,25 @@ public class Player {
         if (keyHandler.rotateLeft) {
             playerShip.setOrientation(playerShip.getOrientation() - playerShip.getRotationSpeed());
         }
+    }
+
+    public void resetOrientation() {
+        if (playerShip.getOrientation() == 360 || playerShip.getOrientation() == -360) {
+            playerShip.setOrientation(0);
+        }
+    }
+
+    public void update() {
+        movePlayer();
+        resetOrientation();
         makeFireable();
         fireMissile();
         moveMissiles();
-
     }
 
     public void draw(Graphics2D g2d) {
 
-        AffineTransform playerTransformer = new AffineTransform(m00, m10, m01, m11, playerX, playerY);
+        playerTransformer.setToTranslation(screenX, screenY);
         playerTransformer.rotate(Math.toRadians(playerShip.getOrientation()),  playerShip.getImage().getWidth()/2.0,
                 playerShip.getImage().getHeight()/2.0);
         g2d.drawImage(playerShip.getImage(), playerTransformer, null);
@@ -113,11 +125,11 @@ public class Player {
         return worldY;
     }
 
-    public static double getScreenX() {
-        return playerX;
+    public static int getScreenX() {
+        return screenX;
     }
 
-    public static double getScreenY() {
-        return playerY;
+    public static int getScreenY() {
+        return screenY;
     }
 }
