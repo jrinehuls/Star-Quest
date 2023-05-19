@@ -1,9 +1,11 @@
 package character;
 
 import controller.KeyHandler;
+import model.missile.Missile;
 import model.missile.UnguidedMissile;
 import model.ship.Ship;
 import view.panel.GamePanel;
+import view.panel.display.MissilePanel;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -18,6 +20,9 @@ public class Player {
 
     Ship playerShip;
     KeyHandler keyHandler;
+
+
+
     ArrayList<UnguidedMissile> firedUnguidedMissiles = new ArrayList<>();
 
     private boolean allowFireable;
@@ -26,16 +31,16 @@ public class Player {
     // Changed screen x & y to int from double.
     private static int screenX;
     private static int screenY;
-    private static int worldX;
-    private static int worldY;
+    private static double worldX;
+    private static double worldY;
     public static int WIDTH;
     public static int HEIGHT;
 
     AffineTransform playerTransformer;
 
     public Player(Ship playerShip, KeyHandler keyHandler) {
-        this.keyHandler = keyHandler;
         this.playerShip = playerShip;
+        this.keyHandler = keyHandler;
         this.unguidedMissileCount = playerShip.getUnguidedMissileCount();
 
         WIDTH = playerShip.getImage().getWidth() * m00;
@@ -43,27 +48,11 @@ public class Player {
 
         screenX = (GamePanel.SCREEN_WIDTH - WIDTH) / 2;
         screenY = (GamePanel.SCREEN_HEIGHT - HEIGHT) / 2;
-        worldX = (GamePanel.WORLD_WIDTH - WIDTH) / 2;
-        worldY = (GamePanel.WORLD_HEIGHT - HEIGHT) / 2;
+        worldX = (GamePanel.WORLD_WIDTH - WIDTH) / 2.0;
+        worldY = (GamePanel.WORLD_HEIGHT - HEIGHT) / 2.0;
 
         playerTransformer = new AffineTransform(m00, m10, m01, m11, screenX, screenY);
         playerShip.setOrientation(0);
-    }
-
-    public void makeFireable() {
-        if (keyHandler.unguidedMissileFired && unguidedMissileCount > 0) {
-            allowFireable = true;
-        }
-    }
-
-    public void fireMissile() {
-        if (!keyHandler.unguidedMissileFired && allowFireable) {
-            UnguidedMissile unguidedMissile = new UnguidedMissile(screenX, screenY, playerShip.getOrientation());
-            unguidedMissile.setVisible(true);
-            firedUnguidedMissiles.add(unguidedMissile);
-            unguidedMissileCount--;
-            allowFireable = false;
-        }
     }
 
     public void moveMissiles() {
@@ -75,8 +64,12 @@ public class Player {
 
     public void movePlayer() {
         if (keyHandler.forwardPressed) {
-            worldY -= Math.round(playerShip.getSpeed() * Math.cos(Math.toRadians(playerShip.getOrientation())));
-            worldX += Math.round(playerShip.getSpeed() * Math.sin(Math.toRadians(playerShip.getOrientation())));
+            worldY -= playerShip.getSpeed() * Math.cos(Math.toRadians(playerShip.getOrientation()));
+            worldX += playerShip.getSpeed() * Math.sin(Math.toRadians(playerShip.getOrientation()));
+        }
+        if (keyHandler.backwardPressed) {
+            worldY += playerShip.getSpeed() * Math.cos(Math.toRadians(playerShip.getOrientation()));
+            worldX -= playerShip.getSpeed() * Math.sin(Math.toRadians(playerShip.getOrientation()));
         }
         if (keyHandler.rotateRight) {
             playerShip.setOrientation(playerShip.getOrientation() + playerShip.getRotationSpeed());
@@ -95,8 +88,6 @@ public class Player {
     public void update() {
         movePlayer();
         resetOrientation();
-        makeFireable();
-        fireMissile();
         moveMissiles();
     }
 
@@ -117,11 +108,11 @@ public class Player {
         }
     }
 
-    public static int getWorldX() {
+    public static double getWorldX() {
         return worldX;
     }
 
-    public static int getWorldY() {
+    public static double getWorldY() {
         return worldY;
     }
 
@@ -132,4 +123,25 @@ public class Player {
     public static int getScreenY() {
         return screenY;
     }
+
+    public Ship getPlayerShip() {
+        return playerShip;
+    }
+
+    public ArrayList<UnguidedMissile> getFiredUnguidedMissiles() {
+        return firedUnguidedMissiles;
+    }
+
+    public void setFiredUnguidedMissiles(ArrayList<UnguidedMissile> firedUnguidedMissiles) {
+        this.firedUnguidedMissiles = firedUnguidedMissiles;
+    }
+
+    public int getUnguidedMissileCount() {
+        return unguidedMissileCount;
+    }
+
+    public void setUnguidedMissileCount(int unguidedMissileCount) {
+        this.unguidedMissileCount = unguidedMissileCount;
+    }
+
 }

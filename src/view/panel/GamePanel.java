@@ -12,8 +12,8 @@ public class GamePanel extends JPanel implements Runnable {
 
     public static final int TILE_SIZE = 32;
 
-    public static final int SCREEN_COLS = 36;
-    public static final int SCREEN_ROWS = 24;
+    public static final int SCREEN_COLS = 30;
+    public static final int SCREEN_ROWS = 20;
     public static final int SCREEN_WIDTH = TILE_SIZE * SCREEN_COLS;
     public static final int SCREEN_HEIGHT = TILE_SIZE * SCREEN_ROWS;
 
@@ -24,8 +24,9 @@ public class GamePanel extends JPanel implements Runnable {
 
     private Thread gameThread = new Thread(this);
 
-    KeyHandler keyHandler = new KeyHandler();
-    Player player = new Player(new Fighter(), keyHandler);
+    static KeyHandler keyHandler = new KeyHandler();
+
+    static Player player = new Player(new Fighter(), keyHandler);
     TileRender tileRender = new TileRender();
 
     public GamePanel() {
@@ -66,6 +67,10 @@ public class GamePanel extends JPanel implements Runnable {
             }
             lastTime = currentTime;
         }
+    }
+
+    public static Player getPlayer() {
+        return player;
     }
 
 }

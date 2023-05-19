@@ -77,14 +77,14 @@ public class TileRender {
     
     public void drawTiles(Graphics2D g2d) {
         int tileSize = GamePanel.TILE_SIZE;                         // 32
-        int x = (int) Player.getScreenX() - Player.getWorldX();     // 560 - 1712 = -1152
-        int y = (int) Player.getScreenY() - Player.getWorldY();     // 368 - 1136 = -768
+        int x = Player.getScreenX() - (int) Math.round(Player.getWorldX());     // 560 - 1712 = -1152
+        int y = Player.getScreenY() - (int) Math.round(Player.getWorldY());     // 368 - 1136 = -768
         for (int i = 0; i < GamePanel.WORLD_ROWS; i++) {            // 72
             for (int j = 0; j < GamePanel.WORLD_COLS; j++) {        // 108
                 g2d.drawImage(tileImages[tile_map[i][j]], x, y, tileSize, tileSize, null);
                 x += tileSize;
             }
-            x = (int) Player.getScreenX() - Player.getWorldX();
+            x = Player.getScreenX() - (int) Player.getWorldX();
             y += tileSize;
         }
     }
